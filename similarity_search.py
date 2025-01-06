@@ -58,14 +58,14 @@ def main():
                 st.write(row["text"])
 
 # Helper function to generate query embedding
-def generate_query_embedding(query_text, model="text-embedding-ada-002"):
+def generate_query_embedding(query_text, model="text-embedding-3-small"):
     from openai import OpenAI
 
     # Set your OpenAI API key
     client = OpenAI(api_key="REMOVED_KEYQMlXBLnf7EPnJUCHAJhnTXC22-gsZMFG6wediH1ShUNYSyjynETd3T3BlbkFJ2ktRAnE3QMtvhpIuQ5GOpYHPKA2R3Mxnrf-Q5MNCaqd35rK0lifM5xUiJx4_fMaxYM51n2ZusA")
 
     # Directory to save query embeddings
-    QUERY_DIR = "/Users/eamonnvincent/Projects/Streamlit-Similarity/Queries"
+    QUERY_DIR = "/Users/eamonnvincent/Dev/Queries"
     os.makedirs(QUERY_DIR, exist_ok=True)  # Ensure the directory exists
 
     try:

@@ -30,7 +30,7 @@ def load_highlights(directory):
             print(f"Error reading {file_path}: {e}")
     return pd.DataFrame(data)
 
-def generate_embeddings(df, model="text-embedding-ada-002"):
+def generate_embeddings(df, model="text-embedding-3-small"):
     """
     Generate embeddings for a DataFrame of text using OpenAI API.
     :param df: DataFrame with 'text' column.
@@ -74,5 +74,5 @@ if __name__ == "__main__":
         sys.exit(1)
 
     directory_path = sys.argv[1]
-    embedding_model = sys.argv[2] if len(sys.argv) > 2 else "text-embedding-ada-002"
+    embedding_model = sys.argv[2] if len(sys.argv) > 2 else "text-embedding-3-small"
     main(directory_path, embedding_model)
