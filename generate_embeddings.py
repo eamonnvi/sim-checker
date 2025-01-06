@@ -58,7 +58,7 @@ def main(directory_path, embedding_model):
 
     # Save embeddings and metadata with timestamped filenames
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = "Embeddings"
+    output_dir = "Embed-Output"
     os.makedirs(output_dir, exist_ok=True)
     npy_filename = os.path.join(output_dir, f"embeddings_{embedding_model}_{timestamp}.npy")
     csv_filename = os.path.join(output_dir, f"metadata_{embedding_model}_{timestamp}.csv")
