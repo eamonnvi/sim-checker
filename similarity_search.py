@@ -2,17 +2,44 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
+import requests
 from datetime import datetime
 from sklearn.metrics.pairwise import cosine_similarity
+
+# Function to download files from Dropbox
+def download_file(url, file_path):
+    """Download a file from a URL if it doesn't already exist."""
+    if not os.path.exists(file_path):
+        st.info(f"Downloading file from {url}...")
+        response = requests.get(url)
+        response.raise_for_status()
+        with open(file_path, 'wb') as f:
+            f.write(response.content)
+        st.success(f"File downloaded and saved: {file_path}")
+
+# Dropbox direct links (replace with your actual links)
+csv_url = "https://www.dropbox.com/scl/fi/m03h7ok57wiex236s4fa2/metadata_text-embedding-3-small_20250106_183211.csv?rlkey=kb2c9iqfbp0lfj0n26fv88c3y&st=tud882v9&dl=1"
+npy_url = "https://www.dropbox.com/scl/fi/v8wr4ky071w8gu828ru6q/embeddings_text-embedding-3-small_20250106_183211.npy?rlkey=fzuq7s8l0jex4jje1byp9vn91&st=kadw8pkn&dl=1"
+
+# Local file paths
+csv_path = "Embed-Output/metadata_text-embedding-3-small_20250106_183211.csv"
+npy_path = "Embed-Output/embeddings_text-embedding-3-small.npy"
+
+# Ensure both files are downloaded before loading
+download_file(csv_url, csv_path)
+download_file(npy_url, npy_path)
+
+# Load the files directly
+try:
+    metadata_df = pd.read_csv(csv_path)
+    embeddings = np.load(npy_path)
+    st.success(f"Loaded {len(metadata_df)} metadata entries and embeddings with shape {embeddings.shape}.")
+except Exception as e:
+    st.error(f"Error loading files: {e}")
 
 # Main Streamlit app
 def main():
     st.title("Similarity Search")
-
-    # Sidebar for file upload
-    st.sidebar.header("Upload Embeddings and Metadata")
-    metadata_file = st.sidebar.file_uploader("Upload Metadata CSV", type="csv")
-    embeddings_file = st.sidebar.file_uploader("Upload Embeddings NPY", type="npy")
 
     # Input section
     st.header("Query Similarity")
@@ -21,22 +48,8 @@ def main():
     top_n = st.slider("Number of results to display", 1, 50, 10)
 
     if st.button("Search"):
-        if not metadata_file or not embeddings_file:
-            st.warning("Please upload both the metadata and embeddings files.")
-            return
-
         if not query_text.strip():
             st.warning("Please enter some text to search.")
-            return
-
-        # Load metadata and embeddings
-        try:
-            highlights_df = pd.read_csv(metadata_file)
-            embeddings = np.load(embeddings_file)
-            st.write(f"Debug: Loaded {len(highlights_df)} entries from metadata.")
-            st.write(f"Debug: Embeddings shape: {embeddings.shape}")
-        except Exception as e:
-            st.error(f"Failed to load files: {e}")
             return
 
         # Generate embedding for the query text
@@ -48,10 +61,10 @@ def main():
         # Perform similarity search
         st.write("Calculating similarities...")
         similarities = cosine_similarity([query_embedding], embeddings).flatten()
-        highlights_df["similarity"] = similarities
+        metadata_df["similarity"] = similarities
 
         # Sort and display top-N results
-        top_results = highlights_df.nlargest(top_n, "similarity")
+        top_results = metadata_df.nlargest(top_n, "similarity")
         for idx, row in top_results.iterrows():
             st.write(f"**{row['file']}** (Score: {row['similarity']:.4f})")
             with st.expander("View full text"):
