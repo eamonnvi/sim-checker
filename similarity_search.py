@@ -78,7 +78,7 @@ def generate_query_embedding(query_text, model="text-embedding-3-small"):
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
     # Directory to save query embeddings
-    QUERY_DIR = "/Users/eamonnvincent/Dev/Queries"
+    QUERY_DIR = "./Queries"
     os.makedirs(QUERY_DIR, exist_ok=True)  # Ensure the directory exists
 
     try:
