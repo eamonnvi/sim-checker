@@ -7,7 +7,7 @@ from datetime import datetime
 from openai import OpenAI
 
 # Set your OpenAI API key
-client = OpenAI(api_key="REMOVED_KEYQMlXBLnf7EPnJUCHAJhnTXC22-gsZMFG6wediH1ShUNYSyjynETd3T3BlbkFJ2ktRAnE3QMtvhpIuQ5GOpYHPKA2R3Mxnrf-Q5MNCaqd35rK0lifM5xUiJx4_fMaxYM51n2ZusA")
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 def load_highlights(directory):
     """
