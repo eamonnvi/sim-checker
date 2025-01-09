@@ -1,0 +1,29 @@
+# macOS system files
+.DS_Store
+
+# Virtual environment and Python caches
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Streamlit secrets and sensitive data
+.streamlit/secrets.toml
+
+# Ignore raw data and redundant scripts
+Embed-Input/*
+!Embed-Input/.gitkeep
+Embed-Output/*
+!Embed-Output/.gitkeep
+generate_embeddings.py
+check_npy_dir3.py
+
+# Ignore the contents of the Queries directory but track the directory itself
+Queries/*
+!Queries/.gitkeep
+
+# Backup and temporary files
+*.bak
+*.tmp
+*.md~
+*.txt~
