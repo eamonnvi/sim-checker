@@ -18,8 +18,8 @@ def download_file(url, file_path):
         st.success(f"File downloaded and saved: {file_path}")
 
 # Dropbox direct links (replace with your actual links)
-csv_url = "https://www.dropbox.com/scl/fi/m03h7ok57wiex236s4fa2/metadata_text-embedding-3-small_20250106_183211.csv?rlkey=kb2c9iqfbp0lfj0n26fv88c3y&st=tud882v9&dl=1"
-npy_url = "https://www.dropbox.com/scl/fi/v8wr4ky071w8gu828ru6q/embeddings_text-embedding-3-small_20250106_183211.npy?rlkey=fzuq7s8l0jex4jje1byp9vn91&st=kadw8pkn&dl=1"
+csv_url = "https://ev-sim-checker-for-streamlit.s3.eu-west-2.amazonaws.com/metadata_text-embedding-3-small_20250106_183211.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAU4ZT6XL2QBMUCW3Q%2F20250111%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250111T090329Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=f94df2d9f36652fbb11d57707ce24e1f790f943158040b1852f4803fecf57fcf"
+npy_url = "https://ev-sim-checker-for-streamlit.s3.eu-west-2.amazonaws.com/embeddings_text-embedding-3-small_20250106_183211.npy?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAU4ZT6XL2QBMUCW3Q%2F20250111%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250111T093822Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=0fe7e73361b98f4f756d04669dc21cfc66a725b73cf48d08ac0c3ad5e0aaf51f"
 
 # Local file paths
 csv_path = "Embed-Output/metadata_text-embedding-3-small_20250106_183211.csv"
