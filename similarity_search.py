@@ -7,7 +7,7 @@ import tempfile
 from datetime import datetime
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Pre-signed URLs for S3 files
+# Pre-signed URLs for your S3-hosted files
 csv_url = "https://ev-sim-checker-for-streamlit.s3.eu-west-2.amazonaws.com/metadata_text-embedding-3-small_20250106_183211.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAU4ZT6XL2QBMUCW3Q%2F20250111%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250111T090329Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=f94df2d9f36652fbb11d57707ce24e1f790f943158040b1852f4803fecf57fcf"
 npy_url = "https://ev-sim-checker-for-streamlit.s3.eu-west-2.amazonaws.com/embeddings_text-embedding-3-small_20250106_183211.npy?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAU4ZT6XL2QBMUCW3Q%2F20250111%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250111T093822Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=0fe7e73361b98f4f756d04669dc21cfc66a725b73cf48d08ac0c3ad5e0aaf51f"
 
@@ -15,6 +15,8 @@ npy_url = "https://ev-sim-checker-for-streamlit.s3.eu-west-2.amazonaws.com/embed
 QUERY_DIR = "./Queries"
 os.makedirs(QUERY_DIR, exist_ok=True)  # Ensure the directory exists
 
+# Caching the file download to avoid repeated network calls
+@st.cache_data
 def download_file(url):
     """Download a file from a URL and return the path to a temporary file."""
     try:
@@ -27,9 +29,10 @@ def download_file(url):
         st.error(f"Error downloading the file: {e}")
         return None
 
+@st.cache_data
 def load_data():
-    """Lazy load the CSV and NPY files only when needed."""
-    st.write("Downloading data from S3...")
+    """Load CSV and NPY files from S3 and cache them for the session."""
+    st.write("Loading and caching data from S3...")
     csv_path = download_file(csv_url)
     npy_path = download_file(npy_url)
     if csv_path and npy_path:
@@ -41,7 +44,7 @@ def load_data():
         return None, None
 
 def generate_query_embedding(query_text, model="text-embedding-3-small"):
-    """Generate and save the query embedding with a timestamp."""
+    """Generate and save a query embedding with timestamp."""
     from openai import OpenAI
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
@@ -68,7 +71,7 @@ def generate_query_embedding(query_text, model="text-embedding-3-small"):
 
 # Main Streamlit App
 def main():
-    st.title("Similarity Search with Lazy Loading and Query Saving")
+    st.title("Similarity Search with Caching and Lazy Loading")
 
     query_text = st.text_area("Enter the text to search:")
 
@@ -77,7 +80,7 @@ def main():
         if metadata_df is None:
             return
         
-        # Generate query embedding and save it
+        # Generate and save the query embedding
         query_embedding = generate_query_embedding(query_text)
         if query_embedding is None:
             return
@@ -86,7 +89,7 @@ def main():
         similarities = cosine_similarity([query_embedding], embeddings).flatten()
         metadata_df["similarity"] = similarities
 
-        # Display results
+        # Display Results
         top_results = metadata_df.nlargest(10, "similarity")
         for idx, row in top_results.iterrows():
             st.write(f"**{row['file']}** (Score: {row['similarity']:.4f})")
