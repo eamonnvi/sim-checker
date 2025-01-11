@@ -3,39 +3,36 @@ import pandas as pd
 import numpy as np
 import os
 import requests
+import tempfile
 from datetime import datetime
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Function to download files from Dropbox
-def download_file(url, file_path):
-    """Download a file from a URL if it doesn't already exist."""
-    if not os.path.exists(file_path):
-        st.info(f"Downloading file from {url}...")
+def download_file(url):
+    """Download a file and return the path to a temporary file."""
+    try:
         response = requests.get(url)
         response.raise_for_status()
-        with open(file_path, 'wb') as f:
-            f.write(response.content)
-        st.success(f"File downloaded and saved: {file_path}")
-
-# Dropbox direct links (replace with your actual links)
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(response.content)
+            return temp_file.name
+    except Exception as e:
+        print(f"Error downloading the file: {e}")
+        return None
+        
+# Fetch the pre-signed URLs instead of local paths
 csv_url = "https://ev-sim-checker-for-streamlit.s3.eu-west-2.amazonaws.com/metadata_text-embedding-3-small_20250106_183211.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAU4ZT6XL2QBMUCW3Q%2F20250111%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250111T090329Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=f94df2d9f36652fbb11d57707ce24e1f790f943158040b1852f4803fecf57fcf"
 npy_url = "https://ev-sim-checker-for-streamlit.s3.eu-west-2.amazonaws.com/embeddings_text-embedding-3-small_20250106_183211.npy?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAU4ZT6XL2QBMUCW3Q%2F20250111%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20250111T093822Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=0fe7e73361b98f4f756d04669dc21cfc66a725b73cf48d08ac0c3ad5e0aaf51f"
 
-# Local file paths
-csv_path = "Embed-Output/metadata_text-embedding-3-small_20250106_183211.csv"
-npy_path = "Embed-Output/embeddings_text-embedding-3-small.npy"
+# Download from S3 and load
+csv_path = download_file(csv_url)
+npy_path = download_file(npy_url)
 
-# Ensure both files are downloaded before loading
-download_file(csv_url, csv_path)
-download_file(npy_url, npy_path)
-
-# Load the files directly
-try:
+# Load the files only if the download succeeds
+if csv_path and npy_path:
     metadata_df = pd.read_csv(csv_path)
     embeddings = np.load(npy_path)
-    st.success(f"Loaded {len(metadata_df)} metadata entries and embeddings with shape {embeddings.shape}.")
-except Exception as e:
-    st.error(f"Error loading files: {e}")
+else:
+    st.error("Failed to load one or both files.")
 
 # Main Streamlit app
 def main():
